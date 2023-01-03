@@ -35,13 +35,14 @@ public class Paciente {
     @Column(length = 1000000000)
     private String historiaClinica;
 
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "idMedico")
     private Medico medico;
 
     @OneToMany(mappedBy = "pacientes", cascade = CascadeType.ALL)
     @JsonIgnore
-    private Set<Citas> citasAgendadas = new HashSet<>();
+    private List<Citas> citasAgendadas = new ArrayList<>();
 
 
 }

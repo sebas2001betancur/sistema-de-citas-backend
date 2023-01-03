@@ -33,6 +33,7 @@ public class MedicoServiceImpl implements MedicoService {
         updateMedico.setEspecialidad(medico.getEspecialidad());
         updateMedico.setHoraInicio(medico.getHoraInicio());
         updateMedico.setHoraFin(medico.getHoraFin());
+        updateMedico.setHospital(medico.getHospital());
 
         return repositorioMedico.save(updateMedico);
     }

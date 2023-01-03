@@ -13,9 +13,13 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashSet;
 
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -36,28 +40,47 @@ public class CitaServiceImpl implements CitaService {
 
 
     @Override
-    public Citas agregarCita(Long idMedico, Long idPaciente) {
+    public Citas agregarCita(Long idMedico, Long idPaciente, LocalTime inicio, LocalTime fin) {
+        // Crea una nueva cita
         Citas citas = new Citas();
+        // Obtiene el paciente y el médico a partir de sus IDs
         Paciente paciente = pacienteService.obtenerPacientePorId(idPaciente);
         Medico medico = medicoService.obtenerMedicoPorId(idMedico);
+        // Obtiene las horas de inicio y fin del médico
         String horaInicio = medico.getHoraInicio();
         String horaFin = medico.getHoraFin();
-        LocalTime inicio = LocalTime.parse(horaInicio);
-        LocalTime fin = LocalTime.parse(horaFin);
+        // Parsea las horas a objetos LocalTime
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        inicio = LocalTime.parse(horaInicio, formatter);
+        fin = LocalTime.parse(horaFin, formatter);
+        // Crea objetos LocalDateTime para la fecha actual y las horas de inicio y fin
+        LocalDateTime inicioCita = LocalDateTime.of(LocalDate.now(), inicio);
+        LocalDateTime finCita = LocalDateTime.of(LocalDate.now(), fin);
 
-        Duration duracionCita = Duration.between(inicio, fin);
+        // Calcula la duración de la cita
+        Duration duracionCita = Duration.between(inicioCita, finCita);
 
-        if (duracionCita.toMinutes() > ESPACIO_ENTRE_CITAS) {
-            throw new IllegalArgumentException("La cita no es válida porque dura más de 1 hora");
-        } else {
-            citas.setNombreMedico(medico.getNombre());
-            citas.setNombrePaciente(paciente.getNombre());
-            citas.setIdentificacionPaciente(paciente.getIdentificacion());
-            citas.setEpsCita(paciente.getEpsPaciente());
-            return repositorioCitas.save(citas);
+        // Obtiene las citas agendadas del médico
+        List<Citas> citasExistente = medico.getCitasAgendadas();
+        // Itera sobre las citas agendadas
+        for (Citas cita : citasExistente){
+            // Verifica si la nueva cita se solapa con
+            if((inicioCita.isAfter(cita.getHoraInicio()) && inicioCita.isBefore(cita.getHoraFin())) ||
+                    (finCita.isAfter(cita.getHoraInicio()) && finCita.isBefore(cita.getHoraFin()))) {
+                throw new IllegalArgumentException("El medico ya tiene una cita asignada en ese horario");
+            } else if (duracionCita.toMinutes() > ESPACIO_ENTRE_CITAS) {
+                throw new IllegalArgumentException("La cita no es válida porque dura más de 1 hora");
+            }
         }
-    }
 
+        citas.setNombreMedico(medico.getNombre());
+        citas.setNombrePaciente(paciente.getNombre());
+        citas.setIdentificacionPaciente(paciente.getIdentificacion());
+        citas.setEpsCita(paciente.getEpsPaciente());
+        citas.setHoraInicio(inicioCita);
+        citas.setHoraFin(finCita);
+        return repositorioCitas.save(citas);
+    }
     @Override
     public Citas obtenerCitasPorId(Long idMedico, Long idPaciente) {
         Paciente paciente = pacienteService.obtenerPacientePorId(idPaciente);

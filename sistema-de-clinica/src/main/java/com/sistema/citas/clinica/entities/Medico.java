@@ -2,6 +2,8 @@ package com.sistema.citas.clinica.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.*;
@@ -33,13 +35,16 @@ public class Medico {
 
     private String horaFin;
 
+    private String hospital;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "idPaciente")
     private Paciente paciente;
 
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "medicos", cascade = CascadeType.ALL)
     @JsonIgnore
-    private Set<Citas> citasAgendadas = new HashSet<>();
+    private List<Citas> citasAgendadas = new ArrayList<>();
 
 
 

@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,9 +22,9 @@ public class CitasController {
 
     //CITAS
 
-    @PostMapping("/AgregarCita/{idMedico}/{idPaciente}")
-    public ResponseEntity<Citas> AgregarCitas(@PathVariable("idMedico") Long idMedico, @PathVariable("idPaciente") Long idPaciente){
-        Citas citasGuardado = citaService.agregarCita(idMedico, idPaciente);
+    @PostMapping("/AgregarCita/{idMedico}/{idPaciente}/{inicioCita}/{finCita}")
+    public ResponseEntity<Citas> AgregarCitas(@PathVariable("idMedico") Long idMedico, @PathVariable("idPaciente") Long idPaciente, @PathVariable("inicioCita") LocalTime inicioCita, @PathVariable("finCita") LocalTime finCita){
+        Citas citasGuardado = citaService.agregarCita(idMedico, idPaciente, inicioCita, finCita);
         return ResponseEntity.ok(citasGuardado);
     }
 

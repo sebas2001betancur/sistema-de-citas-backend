@@ -62,8 +62,8 @@ public class SistemaDeClinicaApplication implements CommandLineRunner {
 
 		pacienteService.agregarPaciente(paciente);*/
 
-		Citas citas = new Citas();
-		citaService.agregarCita(2L, 1L);
+		//Citas citas = new Citas();
+		//citaService.agregarCita(2L, 1L);
 
 		/**citas.setNombreMedico(medico.getNombre());
 		citas.setNombrePaciente(paciente.getNombre());
